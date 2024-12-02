@@ -16,7 +16,7 @@
   ],
   "author": "runicly",
   "license": "ISC",
-  "description": "StringBuilder class that creates strings from buffers",
+  "description": "StringBuilder class for Roblox that creates strings from buffers",
   "types": "out/index.d.ts",
   "files": [
     "out",
