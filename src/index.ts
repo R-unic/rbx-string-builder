@@ -1,5 +1,6 @@
 export class StringBuilder {
 	private buf: buffer;
+	private cachedResult?: string;
 
 	public constructor(initial?: string) {
 		this.buf = initial !== undefined ?
@@ -11,9 +12,11 @@ export class StringBuilder {
 	 * All of the parts combined
 	 */
 	public toString(): string {
-		return buffer.tostring(this.buf);
-	}
+		if (this.cachedResult === undefined)
+			this.cachedResult = buffer.tostring(this.buf);
 
+		return this.cachedResult;
+	}
 	/**
 	 * Formats a string and appends it with a newline at the end
 	 */
@@ -27,7 +30,7 @@ export class StringBuilder {
 	 * Formats a string and appends it
 	 */
 	public appendFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
-		this.append(format.format(...parameters));
+		this.append(string.format(format, ...parameters));
 		return this;
 	}
 
@@ -36,7 +39,13 @@ export class StringBuilder {
 	 * Joins `strings` together using the `separator` and appends it
 	 */
 	public appendJoin(strings: string[], separator = ""): StringBuilder {
+		if (strings.size() === 0)
+			return this;
+
+		const totalSize = strings.reduce((sum, text) => sum + text.size(), 0) + separator.size() * (strings.size() - 1);
+		this.allocate(totalSize);
 		this.append(strings.join(separator));
+
 		return this;
 	}
 
@@ -54,8 +63,10 @@ export class StringBuilder {
 	 */
 	public append(text: string): StringBuilder {
 		const offset = buffer.len(this.buf);
-		this.allocate(text.size());
-		buffer.writestring(this.buf, offset, text, text.size());
+		const textSize = text.size();
+		this.allocate(textSize);
+		buffer.writestring(this.buf, offset, text, textSize);
+		this.invalidateCache();
 
 		return this;
 	}
@@ -64,14 +75,31 @@ export class StringBuilder {
 	 * Appends text with a new line at the end
 	 */
 	public appendLine(text?: string): StringBuilder {
-		this.append((text ?? "") + "\n");
+		if (text !== undefined)
+			this.append(text);
+
+		this.append("\n");
 		return this;
 	}
 
+	private invalidateCache(): void {
+		this.cachedResult = undefined;
+	}
+
+	/**
+	 * @see https://blog.mozilla.org/nnethercote/2014/11/04/please-grow-your-buffers-exponentially/
+	 */
 	private allocate(bytes: number): void {
-		const bufferSize = buffer.len(this.buf);
-		const newBuf = buffer.create(bufferSize + bytes);
-		buffer.copy(newBuf, 0, this.buf, 0, bufferSize);
-		this.buf = newBuf;
+		const currentSize = buffer.len(this.buf);
+		const requiredSize = currentSize + bytes;
+		if (requiredSize > currentSize) {
+			let newSize = currentSize === 0 ? 16 : currentSize;
+			while (newSize < requiredSize)
+				newSize *= 2;
+
+			const newBuf = buffer.create(newSize);
+			buffer.copy(newBuf, 0, this.buf, 0, currentSize);
+			this.buf = newBuf;
+		}
 	}
 }
