@@ -15,27 +15,62 @@ export class StringBuilder {
 	}
 
 	/**
-	 * Appends pieces of strings onto the current result
+	 * Formats a string and appends it with a newline at the end
 	 */
-	public append(text: string): void {
-		const offset = buffer.len(this.buf);
-		this.ensureSize(offset + text.size());
-		buffer.writestring(this.buf, offset, text, text.size());
+	public appendLineFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
+		this.appendFormat(format, ...parameters);
+		this.appendLine();
+		return this;
 	}
 
 	/**
-	 * Appends new lines
-	 * @param amount The amount of new lines to append, defaults to 1
+	 * Formats a string and appends it
 	 */
-	public appendLine(text: string): void {
-		this.append(text + "\n");
+	public appendFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
+		this.append(format.format(...parameters));
+		return this;
 	}
 
-	private ensureSize(minimumSize: number): void {
-		const bufferSize = buffer.len(this.buf);
-		if (minimumSize <= bufferSize) return;
 
-		const newBuf = buffer.create(minimumSize);
+	/**
+	 * Joins `strings` together using the `separator` and appends it
+	 */
+	public appendJoin(strings: string[], separator = ""): StringBuilder {
+		this.append(strings.join(separator));
+		return this;
+	}
+
+	/**
+	 * Joins `strings` together using the `separator` and appends it with a newline at the end of the joined string
+	 */
+	public appendLineJoin(strings: string[], separator = ""): StringBuilder {
+		this.appendJoin(strings, separator);
+		this.appendLine();
+		return this;
+	}
+
+	/**
+	 * Appends text onto the string
+	 */
+	public append(text: string): StringBuilder {
+		const offset = buffer.len(this.buf);
+		this.allocate(text.size());
+		buffer.writestring(this.buf, offset, text, text.size());
+
+		return this;
+	}
+
+	/**
+	 * Appends text with a new line at the end
+	 */
+	public appendLine(text?: string): StringBuilder {
+		this.append((text ?? "") + "\n");
+		return this;
+	}
+
+	private allocate(bytes: number): void {
+		const bufferSize = buffer.len(this.buf);
+		const newBuf = buffer.create(bufferSize + bytes);
 		buffer.copy(newBuf, 0, this.buf, 0, bufferSize);
 		this.buf = newBuf;
 	}
