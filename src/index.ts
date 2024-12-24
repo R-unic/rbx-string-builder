@@ -86,20 +86,11 @@ export class StringBuilder {
 		this.cachedResult = undefined;
 	}
 
-	/**
-	 * @see https://blog.mozilla.org/nnethercote/2014/11/04/please-grow-your-buffers-exponentially/
-	 */
 	private allocate(bytes: number): void {
 		const currentSize = buffer.len(this.buf);
 		const requiredSize = currentSize + bytes;
-		if (requiredSize > currentSize) {
-			let newSize = currentSize === 0 ? 16 : currentSize;
-			while (newSize < requiredSize)
-				newSize *= 2;
-
-			const newBuf = buffer.create(newSize);
-			buffer.copy(newBuf, 0, this.buf, 0, currentSize);
-			this.buf = newBuf;
-		}
+		const newBuf = buffer.create(requiredSize);
+		buffer.copy(newBuf, 0, this.buf, 0, currentSize);
+		this.buf = newBuf;
 	}
 }
