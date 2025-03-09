@@ -1,6 +1,6 @@
 {
   "name": "@rbxts/string-builder",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "out/init.lua",
   "scripts": {
     "build": "rbxtsc",
@@ -16,7 +16,7 @@
   ],
   "author": "runicly",
   "license": "ISC",
-  "description": "StringBuilder class for Roblox that creates strings from buffers",
+  "description": "StringBuilder class for Roblox that creates strings from tables",
   "types": "out/index.d.ts",
   "files": [
     "out",

@@ -1,96 +1,81 @@
 export class StringBuilder {
-	private buf: buffer;
-	private cachedResult?: string;
+  private readonly parts: string[] = [];
+  private cachedResult?: string;
 
-	public constructor(initial?: string) {
-		this.buf = initial !== undefined ?
-			buffer.fromstring(initial)
-			: buffer.create(0);
-	}
+  public constructor(initial?: string) {
+    if (initial === undefined) return;
+    this.parts = [initial];
+  }
 
-	/**
-	 * All of the parts combined
-	 */
-	public toString(): string {
-		if (this.cachedResult === undefined)
-			this.cachedResult = buffer.tostring(this.buf);
+  /**
+   * All of the parts combined
+   */
+  public toString(): string {
+    if (this.cachedResult === undefined)
+      this.cachedResult = this.parts.join();
 
-		return this.cachedResult;
-	}
-	/**
-	 * Formats a string and appends it with a newline at the end
-	 */
-	public appendLineFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
-		this.appendFormat(format, ...parameters);
-		this.appendLine();
-		return this;
-	}
+    return this.cachedResult;
+  }
+  /**
+   * Formats a string and appends it with a newline at the end
+   */
+  public appendLineFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
+    this.appendFormat(format, ...parameters);
+    this.appendLine();
+    return this;
+  }
 
-	/**
-	 * Formats a string and appends it
-	 */
-	public appendFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
-		this.append(string.format(format, ...parameters));
-		return this;
-	}
+  /**
+   * Formats a string and appends it
+   */
+  public appendFormat(format: string, ...parameters: (number | string)[]): StringBuilder {
+    this.append(string.format(format, ...parameters));
+    return this;
+  }
 
 
-	/**
-	 * Joins `strings` together using the `separator` and appends it
-	 */
-	public appendJoin(strings: string[], separator = ""): StringBuilder {
-		if (strings.size() === 0)
-			return this;
+  /**
+   * Joins `strings` together using the `separator` and appends it
+   */
+  public appendJoin(strings: string[], separator = ""): StringBuilder {
+    if (strings.size() === 0)
+      return this;
 
-		const totalSize = strings.reduce((sum, text) => sum + text.size(), 0) + separator.size() * (strings.size() - 1);
-		this.allocate(totalSize);
-		this.append(strings.join(separator));
+    this.append(strings.join(separator));
+    return this;
+  }
 
-		return this;
-	}
+  /**
+   * Joins `strings` together using the `separator` and appends it with a newline at the end of the joined string
+   */
+  public appendLineJoin(strings: string[], separator = ""): StringBuilder {
+    this.appendJoin(strings, separator);
+    this.appendLine();
+    return this;
+  }
 
-	/**
-	 * Joins `strings` together using the `separator` and appends it with a newline at the end of the joined string
-	 */
-	public appendLineJoin(strings: string[], separator = ""): StringBuilder {
-		this.appendJoin(strings, separator);
-		this.appendLine();
-		return this;
-	}
+  /**
+   * Appends text onto the string
+   */
+  public append(text: string): StringBuilder {
+    this.parts.push(text);
+    this.invalidateCache();
 
-	/**
-	 * Appends text onto the string
-	 */
-	public append(text: string): StringBuilder {
-		const offset = buffer.len(this.buf);
-		const textSize = text.size();
-		this.allocate(textSize);
-		buffer.writestring(this.buf, offset, text, textSize);
-		this.invalidateCache();
+    return this;
+  }
 
-		return this;
-	}
+  /**
+   * Appends text with a new line at the end
+   */
+  public appendLine(text?: string): StringBuilder {
+    if (text !== undefined)
+      this.append(text);
 
-	/**
-	 * Appends text with a new line at the end
-	 */
-	public appendLine(text?: string): StringBuilder {
-		if (text !== undefined)
-			this.append(text);
+    this.append("\n");
+    return this;
+  }
 
-		this.append("\n");
-		return this;
-	}
-
-	private invalidateCache(): void {
-		this.cachedResult = undefined;
-	}
-
-	private allocate(bytes: number): void {
-		const currentSize = buffer.len(this.buf);
-		const requiredSize = currentSize + bytes;
-		const newBuf = buffer.create(requiredSize);
-		buffer.copy(newBuf, 0, this.buf, 0, currentSize);
-		this.buf = newBuf;
-	}
+  private invalidateCache(): void {
+    this.cachedResult = undefined;
+  }
 }
