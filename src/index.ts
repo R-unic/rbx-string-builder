@@ -12,7 +12,7 @@ export class StringBuilder {
    */
   public toString(): string {
     if (this.cachedResult === undefined)
-      this.cachedResult = this.parts.join();
+      this.cachedResult = this.parts.join("");
 
     return this.cachedResult;
   }
