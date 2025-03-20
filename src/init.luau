@@ -4,13 +4,13 @@ local StringBuilder = {}
 
 export type StringBuilder = {
   new: (initial: string?) -> StringBuilder;
-  toString: () -> string;
-  append: (text: string) -> StringBuilder;
-  appendLine: (text: string?) -> StringBuilder;
-  appendLineFormat: (format: string, ...{ number | string }) -> StringBuilder;
-  appendFormat: (format: string, ...{ number | string }) -> StringBuilder;
-  appendJoin: (strings: { string }, separator: string?) -> StringBuilder;
-  appendLineJoin: (strings: { string }, separator: string?) -> StringBuilder;
+  toString: (self: StringBuilder) -> string;
+  append: (self: StringBuilder, text: string) -> StringBuilder;
+  appendLine: (self: StringBuilder, text: string?) -> StringBuilder;
+  appendLineFormat: (self: StringBuilder, format: string, ...{ number | string }) -> StringBuilder;
+  appendFormat: (self: StringBuilder, format: string, ...{ number | string }) -> StringBuilder;
+  appendJoin: (self: StringBuilder, strings: { string }, separator: string?) -> StringBuilder;
+  appendLineJoin: (self: StringBuilder, strings: { string }, separator: string?) -> StringBuilder;
 }
 
 function StringBuilder.new(initial: string?): StringBuilder
