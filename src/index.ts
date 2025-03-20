@@ -16,6 +16,7 @@ export class StringBuilder {
 
     return this.cachedResult;
   }
+
   /**
    * Formats a string and appends it with a newline at the end
    */
@@ -38,10 +39,12 @@ export class StringBuilder {
    * Joins `strings` together using the `separator` and appends it
    */
   public appendJoin(strings: string[], separator = ""): StringBuilder {
-    if (strings.size() === 0)
-      return this;
-
-    this.append(strings.join(separator));
+    let i = 0;
+    for (const s of strings) {
+      this.append(s);
+      if (i++ >= strings.size() - 1) continue;
+      this.append(separator);
+    }
     return this;
   }
 
