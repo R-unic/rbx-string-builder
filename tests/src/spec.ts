@@ -1,5 +1,5 @@
 import { Assert, Fact, Theory, InlineData } from "@rbxts/runit";
-import { StringBuilder } from "../../src";
+import StringBuilder from "../src/index";
 
 class StringBuilderTest {
   @Fact
@@ -9,6 +9,7 @@ class StringBuilderTest {
     sb.append("b");
     sb.append("c");
     Assert.equal("abc", sb.toString());
+    Assert.equal("abc", tostring(sb));
   }
 
   @Fact

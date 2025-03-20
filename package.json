@@ -1,13 +1,13 @@
 {
   "name": "@rbxts/string-builder",
-  "version": "1.0.4",
-  "main": "out/init.lua",
+  "version": "1.0.5",
+  "main": "src/init.lua",
   "scripts": {
     "setup-rokit": "rokit trust lune-org/lune && rokit trust rojo-rbx/rojo && rokit install",
     "build": "npm run setup-rokit && rbxtsc ",
     "dev": "npm run build -- -w",
     "prepublishOnly": "npm test",
-    "test": "npm run build && npm run build -- -p tests && rojo build tests -o tests/test-environment.rbxl && lune run tests tests/test-environment.rbxl"
+    "test": "npm run build -- -p tests && rojo build tests -o tests/test-environment.rbxl && lune run tests tests/test-environment.rbxl"
   },
   "keywords": [
     "roblox",
@@ -19,7 +19,7 @@
   "author": "runicly",
   "license": "ISC",
   "description": "StringBuilder class for Roblox that creates strings from tables",
-  "types": "out/index.d.ts",
+  "types": "src/index.d.ts",
   "files": [
     "out",
     "!**/*.tsbuildinfo"

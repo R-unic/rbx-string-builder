@@ -1,0 +1,76 @@
+--!strict
+--!native
+local StringBuilder = {}
+
+export type StringBuilder = {
+  new: (initial: string?) -> StringBuilder;
+  toString: () -> string;
+  append: (text: string) -> StringBuilder;
+  appendLine: (text: string?) -> StringBuilder;
+  appendLineFormat: (format: string, ...{ number | string }) -> StringBuilder;
+  appendFormat: (format: string, ...{ number | string }) -> StringBuilder;
+  appendJoin: (strings: { string }, separator: string?) -> StringBuilder;
+  appendLineJoin: (strings: { string }, separator: string?) -> StringBuilder;
+}
+
+function StringBuilder.new(initial: string?): StringBuilder
+  local self: StringBuilder = {}
+  local parts: { string } = {}
+  local cachedResult: string?
+  if initial then
+    table.insert(parts, initial)
+  end
+
+  function self.toString(): string
+    if not cachedResult then
+      cachedResult = table.concat(parts)
+    end
+    return cachedResult
+  end
+
+  function self.append(_, text: string): StringBuilder
+    table.insert(parts, text)
+    cachedResult = nil
+    return self
+  end
+
+  function self.appendLine(_, text: string?): StringBuilder
+    if not text then
+      text = ""
+    end
+    return self:append(text):append("\n")
+  end
+
+  function self.appendFormat(_, format: string, ...: {number | string}): StringBuilder
+    return self:append(format:format(...))
+  end
+
+  function self.appendLineFormat(_, format: string, ...: {number | string}): StringBuilder
+    return self:appendFormat(format, ...):appendLine()
+  end
+
+  function self.appendJoin(_, strings: { string }, separator: string?): StringBuilder
+    if separator == nil then
+      separator = ""
+    end
+    for i, string in strings do
+      self:append(string)
+      i += 1
+      if i - 1 >= #strings then continue end
+      self:append(separator)
+    end
+    return self
+  end
+
+  function self.appendLineJoin(_, strings: { string }, separator: string?): StringBuilder
+    return self:appendJoin(strings, separator):appendLine()
+  end
+
+  setmetatable(self, {
+    __tostring = self.toString
+  })
+
+  return self
+end
+
+return StringBuilder
