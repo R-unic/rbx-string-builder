@@ -22,6 +22,25 @@ class StringBuilderTest {
   }
 
   @Fact
+  public prepend(): void {
+    const sb = new StringBuilder;
+    sb.prepend("a");
+    sb.prepend("b");
+    sb.prepend("c");
+    Assert.equal("cba", sb.toString());
+    Assert.equal("cba", tostring(sb));
+  }
+
+  @Fact
+  public prependLine(): void {
+    const sb = new StringBuilder;
+    sb.prependLine("a");
+    sb.prependLine("b");
+    sb.prependLine("c");
+    Assert.equal("c\nb\na\n", sb.toString());
+  }
+
+  @Fact
   public appendJoin(): void {
     const sb = new StringBuilder;
     sb.appendJoin(["a", "b", "c"], ".");
